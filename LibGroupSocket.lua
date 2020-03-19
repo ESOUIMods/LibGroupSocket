@@ -11,7 +11,7 @@ end
 if not lib then return end
 
 local LMP = LibMapPing
-local LGPS = LibGPS
+local LGPS = LibGPS2
 
 local function Log(message, ...)
 	df("[%s] %s", libName, message:format(...))
