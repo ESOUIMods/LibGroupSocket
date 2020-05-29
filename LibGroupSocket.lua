@@ -141,7 +141,7 @@ local function InitializeSettingsPanel() -- TODO: localization
 
 		local panelData = {
 			type = "panel",
-			name = "LibGroupSocket",
+			name = "LibGroupSocket v2",
 			author = "sirinsidiator",
 			version = "2",
 			website = "http://www.esoui.com/downloads/info1337-LibGroupSocket.html",
