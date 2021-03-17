@@ -2,7 +2,7 @@
 ## Author: sirinsidiator
 ## Version: 2
 ## AddOnVersion: 2
-## APIVersion: 100017 100018
+## APIVersion: 100033 100034
 ## OptionalDependsOn: LibMapPing LibGPS LibAddonMenu-2.0
 ## SavedVariables: LibGroupSocket_Data
 ## IsLibrary: true
