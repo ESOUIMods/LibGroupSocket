@@ -1,18 +1,18 @@
-## Title: LibGroupSocket v2
+## Title: LibGroupSocket
 ## Author: sirinsidiator
-## Version: 2
-## AddOnVersion: 2
-## APIVersion: 100033 100034
-## OptionalDependsOn: LibMapPing LibGPS LibAddonMenu-2.0
-## SavedVariables: LibGroupSocket_Data
+## Version: 1.3.0
+## APIVersion: 101031
+## AddOnVersion: 13
 ## IsLibrary: true
-##
-## This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates.
-## The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries.
-## All rights reserved
-##
-## You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
+## DependsOn: LibMapPing LibGPS LibAddonMenu-2.0 LibDebugLogger LibChatMessage
+## OptionalDependsOn: LibStub
+## SavedVariables: LibGroupSocket_Data
 
-standalone.lua
+; This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates.
+; The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries.
+; All rights reserved
+;
+; You can read the full terms at https://account.elderscrollsonline.com/add-on-terms
+
 LibGroupSocket.lua
 handlers/ResourceHandler.lua

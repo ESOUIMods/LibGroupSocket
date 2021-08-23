@@ -1,22 +1,31 @@
-local libName, libVersion = "LibGroupSocket", 2
-local lib, oldminor
-if(not LibStub) then
-    lib = {}
+-- LibGroupSocket & its files © sirinsidiator                   --
+-- Distributed under The Artistic License 2.0 (see LICENSE)     --
+------------------------------------------------------------------
+
+local LIB_IDENTIFIER = "LibGroupSocket"
+
+local lib
+if LibStub then
+    local MAJOR, MINOR = LIB_IDENTIFIER, 3
+    lib = LibStub:NewLibrary(MAJOR, MINOR)
+    assert(lib, "LibGroupSocket was loaded more than once. Please ensure that its files are not included from other addons.")
 else
-    lib, oldminor = LibStub:NewLibrary(libName, libVersion)
-    if not lib then
-        return -- already loaded and no upgrade necessary
-    end
+    lib = {}
 end
-if not lib then return end
+
+LibGroupSocket = lib
+lib.standalone = true
 
 local LMP = LibMapPing
 local LGPS = LibGPS2
 
+local logger = LibDebugLogger(LIB_IDENTIFIER)
+local chat = LibChatMessage(LIB_IDENTIFIER, "LGS")
 local function Log(message, ...)
-	df("[%s] %s", libName, message:format(...))
+    logger:Warn(message, ...)
 end
 lib.Log = Log
+lib.logger = logger
 
 --/script PingMap(89, 1, 1 / 2^16, 1 / 2^16) StartChatInput(table.concat({GetMapPlayerWaypoint()}, ","))
 -- smallest step is around 1.428571431461e-005 for Wrothgar, so there should be 70000 steps
@@ -136,69 +145,67 @@ end
 
 local function InitializeSettingsPanel() -- TODO: localization
 	local LAM = LibAddonMenu2
-	if(LAM) then -- if LAM is not available, it is not the stand alone version of LGS. As we can't save anything in that case, we don't bother enforcing a dependency.
-		local function IsSendingDisabled() return not saveData.enabled end
+    local function IsSendingDisabled() return not saveData.enabled end
 
-		local panelData = {
-			type = "panel",
-			name = "LibGroupSocket v2",
-			author = "sirinsidiator",
-			version = "2",
-			website = "http://www.esoui.com/downloads/info1337-LibGroupSocket.html",
-			registerForRefresh = true,
-			registerForDefaults = true
-		}
-		panel = LAM:RegisterAddonPanel("LibGroupSocketOptions", panelData)
+    local panelData = {
+        type = "panel",
+        name = "LibGroupSocket",
+        author = "sirinsidiator",
+        version = "1.3.0",
+        website = "http://www.esoui.com/downloads/info1337-LibGroupSocket.html",
+        registerForRefresh = true,
+        registerForDefaults = true
+    }
+    panel = LAM:RegisterAddonPanel("LibGroupSocketOptions", panelData)
 
-		local optionsData = {}
-		if(not lib.standalone) then -- the stand alone version contains a file that sets standalone = true
-			optionsData[#optionsData + 1] = {
-				type = "description",
-				text = "No stand alone installation detected. Settings won't be saved.",
-				reference = "LibGroupSocketStandAloneWarning"
-			}
-		end
+    local optionsData = {}
+    if(not lib.standalone) then -- the stand alone version contains a file that sets standalone = true
+        optionsData[#optionsData + 1] = {
+            type = "description",
+            text = "No stand alone installation detected. Settings won't be saved.",
+            reference = "LibGroupSocketStandAloneWarning"
+        }
+    end
 
-		optionsData[#optionsData + 1] = {
-			type = "header",
-			name = "General",
-		}
-		optionsData[#optionsData + 1] = {
-			type = "checkbox",
-			name = "Enable Sending",
-			tooltip = "Controls if the library sends any data. It will still receive and process data.",
-			getFunc = function() return saveData.enabled end,
-			setFunc = function(value)
-				saveData.enabled = value
-				RefreshGroupMenuKeyboard()
-				RefreshGroupMenuGamepad()
-			end,
-			default = defaultData.enabled
-		}
-		optionsData[#optionsData + 1] = {
-			type = "checkbox",
-			name = "Disable On Group Left",
-			tooltip = "Automatically disables sending when you leave a group in order to prevent accidentally sending data to a new group.",
-			getFunc = function() return saveData.autoDisableOnGroupLeft end,
-			setFunc = function(value) saveData.autoDisableOnGroupLeft = value end,
-			default = defaultData.enabled
-		}
-		optionsData[#optionsData + 1] = {
-			type = "checkbox",
-			name = "Disable On Session Start",
-			tooltip = "Automatically disables sending when you start the game in order to prevent accidentally sending data to an existing group.",
-			getFunc = function() return saveData.autoDisableOnSessionStart end,
-			setFunc = function(value) saveData.autoDisableOnSessionStart = value end,
-			default = defaultData.enabled
-		}
+    optionsData[#optionsData + 1] = {
+        type = "header",
+        name = "General",
+    }
+    optionsData[#optionsData + 1] = {
+        type = "checkbox",
+        name = "Enable Sending",
+        tooltip = "Controls if the library sends any data. It will still receive and process data.",
+        getFunc = function() return saveData.enabled end,
+        setFunc = function(value)
+            saveData.enabled = value
+            RefreshGroupMenuKeyboard()
+            RefreshGroupMenuGamepad()
+        end,
+        default = defaultData.enabled
+    }
+    optionsData[#optionsData + 1] = {
+        type = "checkbox",
+        name = "Disable On Group Left",
+        tooltip = "Automatically disables sending when you leave a group in order to prevent accidentally sending data to a new group.",
+        getFunc = function() return saveData.autoDisableOnGroupLeft end,
+        setFunc = function(value) saveData.autoDisableOnGroupLeft = value end,
+        default = defaultData.enabled
+    }
+    optionsData[#optionsData + 1] = {
+        type = "checkbox",
+        name = "Disable On Session Start",
+        tooltip = "Automatically disables sending when you start the game in order to prevent accidentally sending data to an existing group.",
+        getFunc = function() return saveData.autoDisableOnSessionStart end,
+        setFunc = function(value) saveData.autoDisableOnSessionStart = value end,
+        default = defaultData.enabled
+    }
 
-		for handlerType, handler in pairs(handlers) do
-			if(handler.InitializeSettings) then
-				handler:InitializeSettings(optionsData, IsSendingDisabled)
-			end
-		end
-		LAM:RegisterOptionControls("LibGroupSocketOptions", optionsData)
-	end
+    for handlerType, handler in pairs(handlers) do
+        if(handler.InitializeSettings) then
+            handler:InitializeSettings(optionsData, IsSendingDisabled)
+        end
+    end
+    LAM:RegisterOptionControls("LibGroupSocketOptions", optionsData)
 end
 
 ------------------------------------------------- OutgoingPacket Class ------------------------------------------------
@@ -482,6 +489,10 @@ function lib:Send(messageType, data)
 	return true
 end
 
+function lib:IsSendingEnabled()
+    return saveData.enabled
+end
+
 local function HandleDataPing(pingType, pingTag, x, y, isPingOwner)
 	x, y = GetMapPingOnCommonMap(pingType, pingTag)
 	if(not LMP:IsPositionOnMap(x, y)) then return false end
@@ -594,14 +605,14 @@ end
 ---------------------------------------------------- Initialization ---------------------------------------------------
 
 local function Unload()
-	EVENT_MANAGER:UnregisterForEvent(libName, EVENT_PLAYER_ACTIVATED)
-    EVENT_MANAGER:UnregisterForEvent(libName, EVENT_UNIT_DESTROYED)
-    EVENT_MANAGER:UnregisterForEvent(libName, EVENT_ADD_ON_LOADED)
+	EVENT_MANAGER:UnregisterForEvent(LIB_IDENTIFIER, EVENT_PLAYER_ACTIVATED)
+    EVENT_MANAGER:UnregisterForEvent(LIB_IDENTIFIER, EVENT_UNIT_DESTROYED)
+    EVENT_MANAGER:UnregisterForEvent(LIB_IDENTIFIER, EVENT_ADD_ON_LOADED)
 	SLASH_COMMANDS["/lgs"] = nil
 end
 
 local function Load()
-	EVENT_MANAGER:RegisterForEvent(libName, EVENT_UNIT_DESTROYED, function()
+	EVENT_MANAGER:RegisterForEvent(LIB_IDENTIFIER, EVENT_UNIT_DESTROYED, function()
 		if(saveData.autoDisableOnGroupLeft and not IsUnitGrouped("player")) then
 			saveData.enabled = false
 			RefreshSettingsPanel()
@@ -611,8 +622,8 @@ local function Load()
 	end)
 
     -- saved variables only become available when EVENT_ADD_ON_LOADED is fired for the library
-    EVENT_MANAGER:RegisterForEvent(libName, EVENT_ADD_ON_LOADED, function(_ ,addonName)
-        if(addonName == libName) then
+    EVENT_MANAGER:RegisterForEvent(LIB_IDENTIFIER, EVENT_ADD_ON_LOADED, function(_ ,addonName)
+        if(addonName == LIB_IDENTIFIER) then
             LibGroupSocket_Data = LibGroupSocket_Data or {}
             saveData = LibGroupSocket_Data[GetDisplayName()] or ZO_DeepTableCopy(defaultData)
             LibGroupSocket_Data[GetDisplayName()] = saveData
@@ -631,8 +642,8 @@ local function Load()
     end)
 
     -- don't initialize the settings menu before we can be sure that it is the newest version of the lib
-    EVENT_MANAGER:RegisterForEvent(libName, EVENT_PLAYER_ACTIVATED, function(_, initial)
-        EVENT_MANAGER:UnregisterForEvent(libName, EVENT_PLAYER_ACTIVATED)
+    EVENT_MANAGER:RegisterForEvent(LIB_IDENTIFIER, EVENT_PLAYER_ACTIVATED, function(_, initial)
+        EVENT_MANAGER:UnregisterForEvent(LIB_IDENTIFIER, EVENT_PLAYER_ACTIVATED)
         if(saveData.autoDisableOnSessionStart and initial) then
             saveData.enabled = false -- don't need to refresh the settings or group menu here, because they are not initialized yet
         end
@@ -643,7 +654,7 @@ local function Load()
 
 	SLASH_COMMANDS["/lgs"] = function(value)
 		saveData.enabled = (value == "1")
-		Log("Data sending %s", saveData.enabled and "enabled" or "disabled")
+		chat:Printf("Data sending %s", saveData.enabled and "enabled" or "disabled")
 		RefreshSettingsPanel()
 		RefreshGroupMenuKeyboard()
 		RefreshGroupMenuGamepad()
@@ -654,5 +665,3 @@ end
 
 if(lib.Unload) then lib.Unload() end
 Load()
-
-LibGroupSocket = lib
