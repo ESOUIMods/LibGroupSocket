@@ -1,8 +1,8 @@
 ## Title: LibGroupSocket
 ## Author: sirinsidiator
-## Version: 1.3.0
-## APIVersion: 101031
-## AddOnVersion: 13
+## Version: 1.4.0
+## APIVersion: 100035
+## AddOnVersion: 14
 ## IsLibrary: true
 ## DependsOn: LibMapPing LibGPS LibAddonMenu-2.0 LibDebugLogger LibChatMessage
 ## OptionalDependsOn: LibStub
