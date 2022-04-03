@@ -4,7 +4,7 @@
 ## APIVersion: 100035
 ## AddOnVersion: 14
 ## IsLibrary: true
-## DependsOn: LibMapPing LibGPS LibAddonMenu-2.0 LibDebugLogger LibChatMessage
+## DependsOn: LibMapPing LibGPS LibAddonMenu-2.0>=33 LibDebugLogger LibChatMessage
 ## OptionalDependsOn: LibStub
 ## SavedVariables: LibGroupSocket_Data
 
